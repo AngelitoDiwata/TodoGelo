@@ -16,6 +16,7 @@
     "cookie": "^0.4.0",
     "cookie-universal-nuxt": "^2.0.18",
     "express": "^4.17.1",
+    "firebase": "^7.2.1",
     "form-data": "^2.5.1",
     "md5": "^2.2.1",
     "nuxt": "^2.0.0"

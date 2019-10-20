@@ -4,9 +4,9 @@
  * STATE, MUTATIONS, GETTERS and ACTIONS.
  */
 
- /**
-  * This are the state
-  */
+/**
+ * This are the state
+ */
 export const state = () => ({
     todos: '',
     delState: false,
@@ -84,6 +84,7 @@ export const getters = {
  * These are the actions, or functions 
  * that contains the store's logic.
  */
+
 export const actions = {
 
     /**
@@ -92,8 +93,21 @@ export const actions = {
      * @param { context } context 
      */
     async nuxtServerInit(context) {
-        const aData = await this.$axios.$get('http://127.0.0.1:8080/api/todo/');
+
         const aLoginResult = this.$cookies.get('loginState');
+        let firebase = require('firebase');
+        let config = {
+            apiKey: "AIzaSyCjHyqn6eE5c9N3seNWpCzMk2jmnCxeYBE",
+            authDomain: "testnuxt-6d314.firebaseapp.com",
+            databaseURL: "https://testnuxt-6d314.firebaseio.com/",
+            storageBucket: "bucket.appspot.com"
+        };
+        if (aLoginResult === '' || aLoginResult === null) {
+            firebase.initializeApp(config);
+        }
+        const aData = await firebase.database().ref('todos/').once('value').then(async function(snapshot) {
+            return await snapshot.val();
+        });
         context.commit('setLoginState', aLoginResult);
         context.commit('loadTodos', aData);
     },
@@ -164,13 +178,11 @@ export const actions = {
      */
     async addOrEditTodo(context, oParams) {
         if (oParams.sFlag === 'Add') {
-            await this.$axios({
-                method: 'post',
-                url: 'http://127.0.0.1:8080/api/todo',
-                data: {
-                    'title': oParams.title,
-                    'description': oParams.desc
-                }
+            let todoCount = this.getters.getTodos.length;
+            await firebase.database().ref('todos/' + todoCount).set({
+                'sequence': todoCount,
+                'title': title,
+                'description': description
             });
             this.dispatch('redirectToMain');
         } else if (oParams.sFlag === 'Edit') {
